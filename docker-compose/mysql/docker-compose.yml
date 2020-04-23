@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  mysql-8.0.19:
+    image: mysql:8.0.19
+    container_name: mysql-8.0.19
+    ports:
+      - 13306:3306
+    ulimits:
+      nproc: 514933
+      nofile:
+        soft: 65535
+        hard: 65535
+    sysctls:
+      net.ipv4.tcp_tw_reuse: 1
+      net.ipv4.ip_local_port_range: 1025 65000
+    environment:
+      - MYSQL_DATABASE=spring-batch
+      - MYSQL_USER=spring-batch
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+      - TZ=UTC
+    volumes:
+      - ./conf/my.cnf:/root/.my.cnf:ro
+      - ./data/conf.d:/etc/mysql/conf.d:ro
+      - ./data/logs:/var/log/mysql:rw
+      - ./data/initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./data/common:/common:ro
+      - ./data/auto-generate:/auto-generate:rw
