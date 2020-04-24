@@ -1,3 +1,10 @@
 #!/bin/sh
 
+mkdir docker-compose/mysql/dir/auto-generate
+mkdir docker-compose/mysql/dir/common
+mkdir docker-compose/mysql/dir/datadir
+mkdir docker-compose/mysql/dir/common
+mkdir docker-compose/mysql/dir/initdb.d
+mkdir docker-compose/mysql/dir/logs
+mkdir docker-compose/mysql/dir/my.cnf
 docker-compose -f docker-compose/mysql/docker-compose.yml up

@@ -29,3 +29,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### generated files ###
+output/
+docker-compose/mysql/dir
+docker-compose/spring-boot/dir

@@ -19,6 +19,8 @@ spring:
     hibernate:
       ddl-auto: none
       use-new-id-generator-mappings: true
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     generate-ddl: false
     open-in-view: false
     properties:
@@ -32,3 +34,7 @@ spring:
     initialize-schema: never
     job:
       enabled: false
+app:
+  report:
+    output-directory: output
+    chunk-size: 1000

@@ -1,4 +1,6 @@
 #!/bin/sh
 
 ./mvnw clean install -Dmaven.test.skip=true
-docker build -t spring-batch-2 .
+cp target/*.jar docker/app.jar
+docker build -t spring-batch-2 docker
+rm docker/app.jar

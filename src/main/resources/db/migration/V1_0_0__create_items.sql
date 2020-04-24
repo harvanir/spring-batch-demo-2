@@ -10,3 +10,5 @@ create table items
     updated_by varchar(50),
     version    int signed              not null default 0
 ) engine = InnoDB;
+
+create index idx_items_created_at on items (created_at asc);

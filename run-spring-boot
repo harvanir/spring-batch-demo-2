@@ -1,3 +1,5 @@
 #!/bin/sh
 
+mkdir docker-compose/spring-boot/dir
+mkdir docker-compose/spring-boot/dir/output
 docker-compose -f docker-compose/spring-boot/docker-compose.yml --compatibility up

@@ -15,3 +15,5 @@ create table order_items
     foreign key (item_id) references items (id),
     unique index (order_id, item_id)
 ) engine = InnoDB;
+
+create index idx_order_items_created_at on order_items (created_at asc);

@@ -21,9 +21,10 @@ services:
       - MYSQL_ROOT_PASSWORD=password
       - TZ=UTC
     volumes:
-      - ./conf/my.cnf:/root/.my.cnf:ro
-      - ./data/conf.d:/etc/mysql/conf.d:ro
-      - ./data/logs:/var/log/mysql:rw
-      - ./data/initdb.d:/docker-entrypoint-initdb.d:ro
-      - ./data/common:/common:ro
-      - ./data/auto-generate:/auto-generate:rw
+      - ./dir/datadir:/var/lib/mysql:rw
+      - ./dir/conf.d:/etc/mysql/conf.d:ro
+      - ./dir/my.cnf:/root/.my.cnf:ro
+      - ./dir/logs:/var/log/mysql:rw
+      - ./dir/initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./dir/common:/common:ro
+      - ./dir/auto-generate:/auto-generate:rw

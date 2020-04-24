@@ -9,3 +9,5 @@ create table orders
     updated_by  varchar(50),
     version     int signed    not null default 0
 ) engine = InnoDB;
+
+create index idx_orders_created_at on orders (created_at asc);
