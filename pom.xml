@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <poi.version>4.1.2</poi.version>
     </properties>
 
     <dependencies>
@@ -49,6 +50,16 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

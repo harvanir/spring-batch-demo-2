@@ -20,5 +20,7 @@ public interface Report {
 
     PreparedStatementSetter getPreparedStatementSetter();
 
-    String getHeader();
+    String[] getHeader();
+
+    String getName();
 }

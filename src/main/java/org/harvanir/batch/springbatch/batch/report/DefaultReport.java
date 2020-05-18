@@ -24,7 +24,9 @@ public class DefaultReport implements Report {
 
     private final PreparedStatementSetter preparedStatementSetter;
 
-    private final String header;
+    private final String[] header;
+
+    private final String name;
 
     @Override
     public String getSelectClause() {
@@ -52,7 +54,12 @@ public class DefaultReport implements Report {
     }
 
     @Override
-    public String getHeader() {
+    public String[] getHeader() {
         return header;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

@@ -21,15 +21,20 @@
         <stringProp name="ThreadGroup.num_threads">${concurrent}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">60</stringProp>
+        <stringProp name="ThreadGroup.duration">${duration}</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
         <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
           <collectionProp name="Arguments.arguments">
+            <elementProp name="duration" elementType="Argument">
+              <stringProp name="Argument.name">duration</stringProp>
+              <stringProp name="Argument.value">60</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
             <elementProp name="concurrent" elementType="Argument">
               <stringProp name="Argument.name">concurrent</stringProp>
-              <stringProp name="Argument.value">16</stringProp>
+              <stringProp name="Argument.value">32</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp name="id" elementType="Argument">
@@ -40,6 +45,11 @@
             <elementProp name="usePaginate" elementType="Argument">
               <stringProp name="Argument.name">usePaginate</stringProp>
               <stringProp name="Argument.value">true</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="fileType" elementType="Argument">
+              <stringProp name="Argument.name">fileType</stringProp>
+              <stringProp name="Argument.value">excel</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
           </collectionProp>
@@ -53,7 +63,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/generate/${id}?usePaginate=${usePaginate}</stringProp>
+          <stringProp name="HTTPSampler.path">/generate/${id}?usePaginate=${usePaginate}&amp;fileType=${fileType}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

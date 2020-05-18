@@ -19,4 +19,6 @@ public class JobServiceRequest {
     private Integer id;
 
     private Boolean usePaginate;
+
+    private FileType fileType;
 }

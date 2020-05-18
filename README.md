@@ -23,5 +23,12 @@ We will create dummy data:
 - Available report {id}:
   - 1 (Items)
   - 2 (Orders)
+- Reading from database mode {usePaginate}:
+  - true
+  - false
+- Available type {fileType}:
+  - csv
+  - excel
 - Generate report by invoking REST API:
-  - [GET] http://localhost:8080/generate/{id}
+  - [GET] http://localhost:8080/generate/{id}?usePaginate={usePaginate}&fileType={fileType}
+- Output directory: <code>docker-compose/spring-boot/dir/output</code>

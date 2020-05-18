@@ -18,6 +18,8 @@ public class BatchConstant {
 
         public static final String WRITE_TO_FILE_STEP = "writeToFileStep";
 
+        public static final String EXCEL_COMPLETION_STEP = "excelCompletionStep";
+
         private JdbcToCsvJob() {
         }
     }

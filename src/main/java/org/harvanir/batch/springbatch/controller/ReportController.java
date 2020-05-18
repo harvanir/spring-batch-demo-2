@@ -1,6 +1,7 @@
 package org.harvanir.batch.springbatch.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.harvanir.batch.springbatch.entity.FileType;
 import org.harvanir.batch.springbatch.entity.JobServiceRequest;
 import org.harvanir.batch.springbatch.service.JobService;
 import org.springframework.util.StopWatch;
@@ -23,7 +24,9 @@ public class ReportController {
     }
 
     @GetMapping("/generate/{id}")
-    public String findAll(@PathVariable Integer id, @RequestParam(required = false, name = "usePaginate") Boolean usePaginate) {
+    public String findAll(@PathVariable Integer id, @RequestParam(required = false, name = "usePaginate") Boolean usePaginate
+            , @RequestParam(required = false, name = "fileType") String fileType
+    ) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -31,6 +34,7 @@ public class ReportController {
                 .builder()
                 .id(id)
                 .usePaginate(usePaginate)
+                .fileType(fileType != null ? FileType.valueOf(fileType.toUpperCase()) : null)
                 .build();
         jobService.run(request);
 

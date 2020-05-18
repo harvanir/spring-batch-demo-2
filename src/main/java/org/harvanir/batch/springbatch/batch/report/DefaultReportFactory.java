@@ -38,7 +38,8 @@ public class DefaultReportFactory implements ReportFactory, InitializingBean {
                 .sortKeys(sortKeys)
                 .sql(selectClause + fromClause)
                 .preparedStatementSetter(null)
-                .header("id,name,quantity,price,created_at,created_by,updated_at,updated_by")
+                .header(new String[]{"id", "name", "quantity", "price", "created_at", "created_by", "updated_at", "updated_by"})
+                .name("Item Report")
                 .build());
 
         selectClause = "select id, status, status_code, created_at, created_by, updated_at, updated_by ";
@@ -53,7 +54,8 @@ public class DefaultReportFactory implements ReportFactory, InitializingBean {
                 .sortKeys(sortKeys)
                 .sql(selectClause + fromClause)
                 .preparedStatementSetter(null)
-                .header("id,status,status_code,created_at,created_by,updated_at,updated_by")
+                .header(new String[]{"id", "status", "status_code", "created_at", "created_by", "updated_at", "updated_by"})
+                .name("Order Report")
                 .build());
     }
 
