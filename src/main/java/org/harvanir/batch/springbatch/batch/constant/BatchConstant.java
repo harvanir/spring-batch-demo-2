@@ -12,15 +12,15 @@ public class BatchConstant {
     private BatchConstant() {
     }
 
-    public static class JdbcToCsvJob {
+    public static class JdbcToFileJob {
 
-        public static final String JOB_NAME = "jdbcToCsvJob";
+        public static final String JOB_NAME = "jdbcToFileJob";
 
         public static final String WRITE_TO_FILE_STEP = "writeToFileStep";
 
         public static final String EXCEL_COMPLETION_STEP = "excelCompletionStep";
 
-        private JdbcToCsvJob() {
+        private JdbcToFileJob() {
         }
     }
 }

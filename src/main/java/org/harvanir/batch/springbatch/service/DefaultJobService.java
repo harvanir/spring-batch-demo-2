@@ -24,13 +24,13 @@ public class DefaultJobService implements JobService {
 
     private final JobLauncher jobLauncher;
 
-    private final ObjectFactory<Job> jdbcToCsvJob;
+    private final ObjectFactory<Job> jdbcToFileJob;
 
     private final ObjectMapper objectMapper;
 
-    public DefaultJobService(JobLauncher jobLauncher, ObjectFactory<Job> jdbcToCsvJob, ObjectMapper objectMapper) {
+    public DefaultJobService(JobLauncher jobLauncher, ObjectFactory<Job> jdbcToFileJob, ObjectMapper objectMapper) {
         this.jobLauncher = jobLauncher;
-        this.jdbcToCsvJob = jdbcToCsvJob;
+        this.jdbcToFileJob = jdbcToFileJob;
         this.objectMapper = objectMapper;
     }
 
@@ -45,7 +45,7 @@ public class DefaultJobService implements JobService {
                 builder.addString(BatchConstant.PAYLOAD, payload);
             }
 
-            jobLauncher.run(jdbcToCsvJob.getObject(), builder.toJobParameters());
+            jobLauncher.run(jdbcToFileJob.getObject(), builder.toJobParameters());
         } catch (JobExecutionAlreadyRunningException | JobParametersInvalidException | JobInstanceAlreadyCompleteException | JobRestartException e) {
             log.error("Error run job.", e);
         }

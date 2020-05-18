@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 public class ServiceConfiguration {
 
     @Bean
-    public JobService jobService(JobLauncher jobLauncher, ObjectFactory<Job> jdbcToCsvJob, ObjectMapper objectMapper) {
-        return new DefaultJobService(jobLauncher, jdbcToCsvJob, objectMapper);
+    public JobService jobService(JobLauncher jobLauncher, ObjectFactory<Job> jdbcToFileJob, ObjectMapper objectMapper) {
+        return new DefaultJobService(jobLauncher, jdbcToFileJob, objectMapper);
     }
 }

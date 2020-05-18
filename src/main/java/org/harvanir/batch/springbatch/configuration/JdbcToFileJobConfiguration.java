@@ -47,15 +47,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToCsvJob.JOB_NAME;
-import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToCsvJob.WRITE_TO_FILE_STEP;
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.JOB_NAME;
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.WRITE_TO_FILE_STEP;
 
 /**
  * @author Harvan Irsyadi
  */
 @Slf4j
 @Configuration(proxyBeanMethods = false)
-public class JdbcToCsvJobConfiguration {
+public class JdbcToFileJobConfiguration {
 
     @Bean
     public ReportFactory sqlBuilderFactory() {
@@ -81,7 +81,7 @@ public class JdbcToCsvJobConfiguration {
 
     @Bean
     @JobScope
-    public Report reportBuilder(
+    public Report report(
             ReportFactory reportFactory,
             JobServiceRequest jobServiceRequest
     ) {
@@ -95,7 +95,7 @@ public class JdbcToCsvJobConfiguration {
             DataSource dataSource,
             Report report
     ) {
-        log.info("Initializing item reader...");
+        log.info("Initializing defaultItemReader...");
 
         JdbcCursorItemReader<List<Object>> reader = new CustomJdbcCursorItemReader();
         reader.setDataSource(dataSource);
@@ -113,7 +113,7 @@ public class JdbcToCsvJobConfiguration {
             AppProperties properties,
             Report report
     ) {
-        log.info("Initializing paginate item reader...");
+        log.info("Initializing paginated item reader...");
 
         JdbcPagingItemReaderBuilder<List<Object>> builder = new JdbcPagingItemReaderBuilder<>();
         builder.selectClause(report.getSelectClause());
@@ -130,7 +130,7 @@ public class JdbcToCsvJobConfiguration {
     @Bean
     @JobScope
     public FlatFileItemWriter<List<Object>> csvItemWriter(Report report, AppProperties properties) {
-        log.info("Initializing item writer...");
+        log.info("Initializing csvItemWriter...");
 
         String fileSeparator = System.getProperty("file.separator");
         String fileType = ".csv";
@@ -239,14 +239,14 @@ public class JdbcToCsvJobConfiguration {
     @Bean
     @JobScope
     public Step excelCompletionStep(StepBuilderFactory stepBuilderFactory, Tasklet exeTasexcelCompletionTaskletklet) {
-        return stepBuilderFactory.get(BatchConstant.JdbcToCsvJob.EXCEL_COMPLETION_STEP)
+        return stepBuilderFactory.get(BatchConstant.JdbcToFileJob.EXCEL_COMPLETION_STEP)
                 .tasklet(exeTasexcelCompletionTaskletklet)
                 .build();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public Job jdbcToCsvJob(JobBuilderFactory jobBuilderFactory, Step writeToFileStep, Step excelCompletionStep) {
+    public Job jdbcToFileJob(JobBuilderFactory jobBuilderFactory, Step writeToFileStep, Step excelCompletionStep) {
         log.info("Initializing job...");
 
         return jobBuilderFactory.get(JOB_NAME)
