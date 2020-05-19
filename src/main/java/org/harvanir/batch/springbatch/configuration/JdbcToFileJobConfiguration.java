@@ -40,6 +40,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -224,11 +225,18 @@ public class JdbcToFileJobConfiguration {
                 String fileType = ".xlsx";
                 String outputDir = properties.getReport().getOutputDirectory();
                 String fileName = outputDir + fileSeparator + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "-" + UUID.randomUUID().toString() + fileType;
+                File file = new File(fileName);
 
-                try (FileOutputStream fileOutputStream = new FileOutputStream(fileName)) {
-                    workbook.write(fileOutputStream);
-                } catch (Exception e) {
-                    log.error("Error create file output stream.", e);
+                if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(file);
+                         Workbook theWorkBook = workbook
+                    ) {
+                        theWorkBook.write(fileOutputStream);
+                    } catch (Exception e) {
+                        log.error("Error create file output stream.", e);
+                    }
+                } else {
+                    log.warn("No file created: {}", file);
                 }
             }
 
