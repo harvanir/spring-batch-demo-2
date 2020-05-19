@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 public class AppProperties {
 
-    private Report report = new Report();
+    private final Report report = new Report();
 
     @Getter
     @Setter

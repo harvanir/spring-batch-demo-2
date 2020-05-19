@@ -128,19 +128,21 @@ public class JdbcToFileJobConfiguration {
         return builder.build();
     }
 
+    private String getFileName(AppProperties properties, String fileType) {
+        String fileSeparator = System.getProperty("file.separator");
+        String outputDir = properties.getReport().getOutputDirectory();
+
+        return outputDir + fileSeparator + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "-" + UUID.randomUUID().toString() + fileType;
+    }
+
     @Bean
     @JobScope
     public FlatFileItemWriter<List<Object>> csvItemWriter(Report report, AppProperties properties) {
         log.info("Initializing csvItemWriter...");
 
-        String fileSeparator = System.getProperty("file.separator");
-        String fileType = ".csv";
-        String outputDir = properties.getReport().getOutputDirectory();
-        String fileName = outputDir + fileSeparator + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "-" + UUID.randomUUID().toString() + fileType;
-
         FlatFileItemWriter<List<Object>> itemWriter = new FlatFileItemWriter<>();
 
-        itemWriter.setResource(new FileSystemResource(fileName));
+        itemWriter.setResource(new FileSystemResource(getFileName(properties, ".csv")));
         itemWriter.setAppendAllowed(true);
         itemWriter.setLineAggregator(new DelimitedLineAggregator<>());
         itemWriter.setHeaderCallback(writer -> writer.write(String.join(",", report.getHeader())));
@@ -221,11 +223,7 @@ public class JdbcToFileJobConfiguration {
             if (taskletContext.isShouldExecute()) {
                 log.info("Executing completion...");
 
-                String fileSeparator = System.getProperty("file.separator");
-                String fileType = ".xlsx";
-                String outputDir = properties.getReport().getOutputDirectory();
-                String fileName = outputDir + fileSeparator + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "-" + UUID.randomUUID().toString() + fileType;
-                File file = new File(fileName);
+                File file = new File(getFileName(properties, ".xlsx"));
 
                 if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
                     try (FileOutputStream fileOutputStream = new FileOutputStream(file);
