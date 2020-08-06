@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.harvanir.batch.springbatch.service.DefaultJobService;
 import org.harvanir.batch.springbatch.service.JobService;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 public class ServiceConfiguration {
 
     @Bean
-    public JobService jobService(JobLauncher jobLauncher, ObjectFactory<Job> jdbcToFileJob, ObjectMapper objectMapper) {
-        return new DefaultJobService(jobLauncher, jdbcToFileJob, objectMapper);
+    public JobService jobService(ApplicationContext applicationContext, JobLauncher jobLauncher, ObjectMapper objectMapper) {
+        return new DefaultJobService(applicationContext, jobLauncher, objectMapper);
     }
 }

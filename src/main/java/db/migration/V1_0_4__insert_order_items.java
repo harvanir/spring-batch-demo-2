@@ -15,6 +15,8 @@ import java.util.Random;
 @Slf4j
 public class V1_0_4__insert_order_items extends BaseJavaMigration {
 
+    private Random random = new Random(0);
+
     @Override
     public void migrate(Context context) throws Exception {
         insertOrder(context.getConnection());
@@ -72,6 +74,4 @@ public class V1_0_4__insert_order_items extends BaseJavaMigration {
             throw new RuntimeException(e);
         }
     }
-
-    Random random = new Random(0);
 }

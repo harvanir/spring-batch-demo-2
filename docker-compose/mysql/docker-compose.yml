@@ -23,8 +23,8 @@ services:
     volumes:
       - ./dir/datadir:/var/lib/mysql:rw
       - ./dir/conf.d:/etc/mysql/conf.d:ro
-      - ./dir/my.cnf:/root/.my.cnf:ro
-      - ./dir/logs:/var/log/mysql:rw
       - ./dir/initdb.d:/docker-entrypoint-initdb.d:ro
-      - ./dir/common:/common:ro
-      - ./dir/auto-generate:/auto-generate:rw
+#      - ./dir/my.cnf:/root/.my.cnf:ro
+#      - ./dir/logs:/var/log/mysql:rw
+#      - ./dir/common:/common:ro
+#      - ./dir/auto-generate:/auto-generate:rw

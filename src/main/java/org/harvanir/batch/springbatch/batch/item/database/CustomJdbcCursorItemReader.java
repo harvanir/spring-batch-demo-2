@@ -3,7 +3,6 @@ package org.harvanir.batch.springbatch.batch.item.database;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.support.JdbcUtils;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -14,9 +13,9 @@ import java.util.List;
 
 public class CustomJdbcCursorItemReader extends JdbcCursorItemReader<List<Object>> { // NOSONAR
 
-    private PreparedStatement preparedStatement;
-
     private Field sqlField;
+
+    private Field preparedStatementField;
 
     private Field preparedStatementSetterField;
 
@@ -27,10 +26,13 @@ public class CustomJdbcCursorItemReader extends JdbcCursorItemReader<List<Object
     private void initialize() {
         try {
             sqlField = JdbcCursorItemReader.class.getDeclaredField("sql");
-            sqlField.setAccessible(true);
+            sqlField.setAccessible(true); //NOSONAR
+
+            preparedStatementField = JdbcCursorItemReader.class.getDeclaredField("preparedStatement");
+            preparedStatementField.setAccessible(true); //NOSONAR
 
             preparedStatementSetterField = JdbcCursorItemReader.class.getDeclaredField("preparedStatementSetter");
-            preparedStatementSetterField.setAccessible(true);
+            preparedStatementSetterField.setAccessible(true); //NOSONAR
         } catch (Exception e) {
             throw new JdbcItemReaderException("Error initialize", e);
         }
@@ -50,13 +52,17 @@ public class CustomJdbcCursorItemReader extends JdbcCursorItemReader<List<Object
         PreparedStatementSetter preparedStatementSetter = (PreparedStatementSetter) this.preparedStatementSetterField.get(this);
 
         try {
+            PreparedStatement preparedStatement;
             if (isUseSharedExtendedConnection()) {
                 preparedStatement = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
                         ResultSet.HOLD_CURSORS_OVER_COMMIT);
             } else {
                 preparedStatement = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             }
+
+            preparedStatementField.set(this, preparedStatement); //NOSONAR
             applyStatementSettings(preparedStatement);
+
             if (preparedStatementSetter != null) {
                 preparedStatementSetter.setValues(preparedStatement);
             }
@@ -69,10 +75,5 @@ public class CustomJdbcCursorItemReader extends JdbcCursorItemReader<List<Object
                 throw exception;
             }
         }
-    }
-
-    @Override
-    protected void cleanupOnClose() {
-        JdbcUtils.closeStatement(this.preparedStatement);
     }
 }

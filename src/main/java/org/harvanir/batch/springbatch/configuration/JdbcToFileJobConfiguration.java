@@ -1,8 +1,6 @@
 package org.harvanir.batch.springbatch.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -21,6 +19,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemWriter;
@@ -31,8 +30,10 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.function.FunctionItemProcessor;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -48,7 +49,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.CSV_ITEM_WRITER;
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.DEFAULT_ITEM_READER;
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.EXCEL_COMPLETION_STEP;
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.EXCEL_ITEM_WRITER;
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.EXECEL_COMPLETION_TASKLET;
 import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.JOB_NAME;
+import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.PAGINATED_ITEM_READER;
 import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcToFileJob.WRITE_TO_FILE_STEP;
 
 /**
@@ -90,7 +97,7 @@ public class JdbcToFileJobConfiguration {
         return reportFactory.get(jobServiceRequest.getId());
     }
 
-    @Bean
+    @Bean(name = DEFAULT_ITEM_READER)
     @JobScope
     public JdbcCursorItemReader<List<Object>> defaultItemReader(
             DataSource dataSource,
@@ -107,7 +114,7 @@ public class JdbcToFileJobConfiguration {
         return reader;
     }
 
-    @Bean
+    @Bean(name = PAGINATED_ITEM_READER)
     @JobScope
     public JdbcPagingItemReader<List<Object>> paginatedItemReader(
             DataSource dataSource,
@@ -135,7 +142,7 @@ public class JdbcToFileJobConfiguration {
         return outputDir + fileSeparator + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "-" + UUID.randomUUID().toString() + fileType;
     }
 
-    @Bean
+    @Bean(name = CSV_ITEM_WRITER)
     @JobScope
     public FlatFileItemWriter<List<Object>> csvItemWriter(Report report, AppProperties properties) {
         log.info("Initializing csvItemWriter...");
@@ -150,7 +157,6 @@ public class JdbcToFileJobConfiguration {
         return itemWriter;
     }
 
-
     @Bean
     @JobScope
     public Workbook workbook(AppProperties appProperties) {
@@ -159,7 +165,7 @@ public class JdbcToFileJobConfiguration {
         return new SXSSFWorkbook(appProperties.getReport().getChunkSize());
     }
 
-    @Bean
+    @Bean(name = EXCEL_ITEM_WRITER)
     @JobScope
     public WorkbookItemWriter excelItemWriter(Workbook workBook, Report report) {
         log.info("Initializing excelItemWriter...");
@@ -167,20 +173,14 @@ public class JdbcToFileJobConfiguration {
         return new WorkbookItemWriter(workBook, report);
     }
 
-    @Bean
-    @JobScope
-    public TaskletContext jobExecutionContext(JobServiceRequest jobServiceRequest) {
-        return new TaskletContext(isExcel(jobServiceRequest));
-    }
-
-    @Bean
+    @Bean(name = WRITE_TO_FILE_STEP)
     @JobScope
     public Step writeToFileStep(
             StepBuilderFactory stepBuilderFactory,
-            JdbcCursorItemReader<List<Object>> defaultItemReader,
-            JdbcPagingItemReader<List<Object>> paginatedItemReader,
-            FlatFileItemWriter<List<Object>> csvItemWriter,
-            ItemWriter<List<Object>> excelItemWriter,
+            @Qualifier(DEFAULT_ITEM_READER) JdbcCursorItemReader<List<Object>> defaultItemReader,
+            @Qualifier(PAGINATED_ITEM_READER) JdbcPagingItemReader<List<Object>> paginatedItemReader,
+            @Qualifier(CSV_ITEM_WRITER) FlatFileItemWriter<List<Object>> csvItemWriter,
+            @Qualifier(EXCEL_ITEM_WRITER) ItemWriter<List<Object>> excelItemWriter,
             AppProperties properties,
             JobServiceRequest jobServiceRequest
     ) {
@@ -214,57 +214,62 @@ public class JdbcToFileJobConfiguration {
         return jobServiceRequest.getFileType() != null && FileType.EXCEL.equals(jobServiceRequest.getFileType());
     }
 
-    @Bean
+    @Bean(name = EXECEL_COMPLETION_TASKLET)
     @JobScope
-    public Tasklet excelCompletionTasklet(TaskletContext taskletContext, Workbook workbook, AppProperties properties) {
+    public Tasklet excelCompletionTasklet(Workbook workbook, AppProperties properties) {
         log.info("Initializing excelCompletionTasklet...");
 
         return (contribution, chunkContext) -> {
-            if (taskletContext.isShouldExecute()) {
-                log.info("Executing completion...");
+            log.info("Executing completion...");
 
-                File file = new File(getFileName(properties, ".xlsx"));
+            File file = new File(getFileName(properties, ".xlsx"));
 
-                if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
-                    try (FileOutputStream fileOutputStream = new FileOutputStream(file);
-                         Workbook theWorkBook = workbook
-                    ) {
-                        theWorkBook.write(fileOutputStream);
-                    } catch (Exception e) {
-                        log.error("Error create file output stream.", e);
-                    }
-                } else {
-                    log.warn("No file created: {}", file);
+            if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
+                try (FileOutputStream fileOutputStream = new FileOutputStream(file);
+                     Workbook theWorkBook = workbook
+                ) {
+                    theWorkBook.write(fileOutputStream);
+                } catch (Exception e) {
+                    log.error("Error create file output stream.", e);
                 }
+            } else {
+                log.warn("No file created: {}", file);
             }
 
             return RepeatStatus.FINISHED;
         };
     }
 
-    @Bean
+    @Bean(name = EXCEL_COMPLETION_STEP)
     @JobScope
-    public Step excelCompletionStep(StepBuilderFactory stepBuilderFactory, Tasklet exeTasexcelCompletionTaskletklet) {
+    public Step excelCompletionStep(StepBuilderFactory stepBuilderFactory
+            , @Qualifier(EXECEL_COMPLETION_TASKLET) Tasklet tasklet
+    ) {
         return stepBuilderFactory.get(BatchConstant.JdbcToFileJob.EXCEL_COMPLETION_STEP)
-                .tasklet(exeTasexcelCompletionTaskletklet)
+                .tasklet(tasklet)
                 .build();
+    }
+
+    private Job createJob(FileType fileType, JobBuilderFactory jobBuilderFactory, Step writeToFileStep, Step excelCompletionStep) {
+        log.info("Initializing job...");
+
+        SimpleJobBuilder jobBuilder = jobBuilderFactory.get(JOB_NAME)
+                .start(writeToFileStep);
+
+        if (FileType.EXCEL.equals(fileType)) {
+            jobBuilder = jobBuilder.next(excelCompletionStep);
+        }
+
+        return jobBuilder.build();
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public Job jdbcToFileJob(JobBuilderFactory jobBuilderFactory, Step writeToFileStep, Step excelCompletionStep) {
-        log.info("Initializing job...");
+    public Job jdbcToFileJob(JobServiceRequest jobServiceRequest, ApplicationContext applicationContext) {
+        JobBuilderFactory jobBuilderFactory = applicationContext.getBean(JobBuilderFactory.class);
+        Step writeToFileStep = (Step) applicationContext.getBean(WRITE_TO_FILE_STEP);
+        Step excelCompletionStep = (Step) applicationContext.getBean(EXCEL_COMPLETION_STEP);
 
-        return jobBuilderFactory.get(JOB_NAME)
-                .start(writeToFileStep)
-                .next(excelCompletionStep)
-                .build();
-    }
-
-    @AllArgsConstructor
-    @Getter
-    static class TaskletContext {
-
-        private final boolean shouldExecute;
+        return createJob(jobServiceRequest.getFileType(), jobBuilderFactory, writeToFileStep, excelCompletionStep);
     }
 }

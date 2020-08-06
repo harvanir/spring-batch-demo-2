@@ -12,7 +12,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.util.UUID;
 
@@ -24,13 +24,13 @@ public class DefaultJobService implements JobService {
 
     private final JobLauncher jobLauncher;
 
-    private final ObjectFactory<Job> jdbcToFileJob;
+    private final ApplicationContext applicationContext;
 
     private final ObjectMapper objectMapper;
 
-    public DefaultJobService(JobLauncher jobLauncher, ObjectFactory<Job> jdbcToFileJob, ObjectMapper objectMapper) {
+    public DefaultJobService(ApplicationContext applicationContext, JobLauncher jobLauncher, ObjectMapper objectMapper) {
+        this.applicationContext = applicationContext;
         this.jobLauncher = jobLauncher;
-        this.jdbcToFileJob = jdbcToFileJob;
         this.objectMapper = objectMapper;
     }
 
@@ -45,7 +45,7 @@ public class DefaultJobService implements JobService {
                 builder.addString(BatchConstant.PAYLOAD, payload);
             }
 
-            jobLauncher.run(jdbcToFileJob.getObject(), builder.toJobParameters());
+            jobLauncher.run(applicationContext.getBean(Job.class, jobServiceRequest, applicationContext), builder.toJobParameters());
         } catch (JobExecutionAlreadyRunningException | JobParametersInvalidException | JobInstanceAlreadyCompleteException | JobRestartException e) {
             log.error("Error run job.", e);
         }
