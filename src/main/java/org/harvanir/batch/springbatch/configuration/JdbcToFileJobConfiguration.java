@@ -157,9 +157,9 @@ public class JdbcToFileJobConfiguration {
         return itemWriter;
     }
 
-    @Bean
+    @Bean(destroyMethod = "close")
     @JobScope
-    public Workbook workbook(AppProperties appProperties) {
+    public SXSSFWorkbook workbook(AppProperties appProperties) {
         log.info("Initializing Workbook...");
 
         return new SXSSFWorkbook(appProperties.getReport().getChunkSize());
@@ -225,10 +225,8 @@ public class JdbcToFileJobConfiguration {
             File file = new File(getFileName(properties, ".xlsx"));
 
             if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
-                try (FileOutputStream fileOutputStream = new FileOutputStream(file);
-                     Workbook theWorkBook = workbook
-                ) {
-                    theWorkBook.write(fileOutputStream);
+                try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                    workbook.write(fileOutputStream);
                 } catch (Exception e) {
                     log.error("Error create file output stream.", e);
                 }
