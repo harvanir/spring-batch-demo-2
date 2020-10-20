@@ -240,34 +240,29 @@ public class JdbcToFileJobConfiguration {
 
     @Bean(name = EXCEL_COMPLETION_STEP)
     @JobScope
-    public Step excelCompletionStep(StepBuilderFactory stepBuilderFactory
-            , @Qualifier(EXECEL_COMPLETION_TASKLET) Tasklet tasklet
+    public Step excelCompletionStep(
+            StepBuilderFactory stepBuilderFactory,
+            @Qualifier(EXECEL_COMPLETION_TASKLET) Tasklet tasklet
     ) {
         return stepBuilderFactory.get(BatchConstant.JdbcToFileJob.EXCEL_COMPLETION_STEP)
                 .tasklet(tasklet)
                 .build();
     }
 
-    private Job createJob(FileType fileType, JobBuilderFactory jobBuilderFactory, Step writeToFileStep, Step excelCompletionStep) {
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public Job jdbcToFileJob(JobServiceRequest jobServiceRequest, ApplicationContext applicationContext) {
         log.info("Initializing job...");
 
-        SimpleJobBuilder jobBuilder = jobBuilderFactory.get(JOB_NAME)
-                .start(writeToFileStep);
+        JobBuilderFactory jobBuilderFactory = applicationContext.getBean(JobBuilderFactory.class);
+        Step writeToFileStep = (Step) applicationContext.getBean(WRITE_TO_FILE_STEP);
+        SimpleJobBuilder jobBuilder = jobBuilderFactory.get(JOB_NAME).start(writeToFileStep);
 
-        if (FileType.EXCEL.equals(fileType)) {
+        if (FileType.EXCEL.equals(jobServiceRequest.getFileType())) {
+            Step excelCompletionStep = (Step) applicationContext.getBean(EXCEL_COMPLETION_STEP);
             jobBuilder = jobBuilder.next(excelCompletionStep);
         }
 
         return jobBuilder.build();
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public Job jdbcToFileJob(JobServiceRequest jobServiceRequest, ApplicationContext applicationContext) {
-        JobBuilderFactory jobBuilderFactory = applicationContext.getBean(JobBuilderFactory.class);
-        Step writeToFileStep = (Step) applicationContext.getBean(WRITE_TO_FILE_STEP);
-        Step excelCompletionStep = (Step) applicationContext.getBean(EXCEL_COMPLETION_STEP);
-
-        return createJob(jobServiceRequest.getFileType(), jobBuilderFactory, writeToFileStep, excelCompletionStep);
     }
 }

@@ -30,5 +30,5 @@ We will create dummy data:
   - csv
   - excel
 - Generate report by invoking REST API:
-  - [GET] http://localhost:8080/generate/{id}?usePaginate={usePaginate}&fileType={fileType}
+  - [GET] http://localhost:8888/generate/{id}?usePaginate={usePaginate}&fileType={fileType}
 - Output directory: <code>docker-compose/spring-boot/dir/output</code>

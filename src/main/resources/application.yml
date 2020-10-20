@@ -1,6 +1,16 @@
+info:
+  app:
+    name: ${spring.application.name}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health,prometheus
 server:
-  port: 8080
+  port: 8888
 spring:
+  application:
+    name: spring-batch-demo-2
   datasource:
     url: jdbc:mysql://localhost:13306/spring-batch?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&useJDBCCOmpliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: spring-batch

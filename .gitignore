@@ -32,5 +32,5 @@ build/
 
 ### generated files ###
 output/
-docker-compose/mysql/dir
+docker-compose/mysql/dir/datadir
 docker-compose/spring-boot/dir

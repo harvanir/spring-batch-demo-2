@@ -5,8 +5,8 @@ services:
     container_name: spring-batch-2
     image: spring-batch-2
     ports:
-      - 8181:8080
-      - 7001:7001
+      - 8888:8888
+      - 8001:8001
     network_mode: host
     ulimits:
       nproc: 514933
@@ -24,7 +24,7 @@ services:
         -XX:+ExitOnOutOfMemoryError
         -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
-        -Dcom.sun.management.jmxremote.port=7001 -Dcom.sun.management.jmxremote.rmi.port=7001
+        -Dcom.sun.management.jmxremote.port=8001 -Dcom.sun.management.jmxremote.rmi.port=8001
         -Dapp.report.chunk-size=1000
     deploy:
       resources:

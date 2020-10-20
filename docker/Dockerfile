@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:11.0.7-jre-headless
+FROM azul/zulu-openjdk-alpine:11.0.8-11.41.23-jre-headless
 
 # Fix error apache poi, FontManagerFactory
 RUN apk add --update ttf-dejavu && rm -rf /var/cache/apk/*
