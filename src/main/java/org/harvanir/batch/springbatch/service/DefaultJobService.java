@@ -5,14 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.harvanir.batch.springbatch.batch.constant.BatchConstant;
 import org.harvanir.batch.springbatch.entity.JobServiceRequest;
 import org.harvanir.batch.springbatch.util.ObjectMapperUtils;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.context.ApplicationContext;
 
 import java.util.UUID;
 
@@ -24,14 +22,14 @@ public class DefaultJobService implements JobService {
 
     private final JobLauncher jobLauncher;
 
-    private final ApplicationContext applicationContext;
-
     private final ObjectMapper objectMapper;
 
-    public DefaultJobService(ApplicationContext applicationContext, JobLauncher jobLauncher, ObjectMapper objectMapper) {
-        this.applicationContext = applicationContext;
+    private final JobFactory jobFactory;
+
+    public DefaultJobService(JobLauncher jobLauncher, ObjectMapper objectMapper, JobFactory jobFactory) {
         this.jobLauncher = jobLauncher;
         this.objectMapper = objectMapper;
+        this.jobFactory = jobFactory;
     }
 
     @Override
@@ -45,7 +43,7 @@ public class DefaultJobService implements JobService {
                 builder.addString(BatchConstant.PAYLOAD, payload);
             }
 
-            jobLauncher.run(applicationContext.getBean(Job.class, jobServiceRequest, applicationContext), builder.toJobParameters());
+            jobLauncher.run(jobFactory.defaultJob(jobServiceRequest), builder.toJobParameters());
         } catch (JobExecutionAlreadyRunningException | JobParametersInvalidException | JobInstanceAlreadyCompleteException | JobRestartException e) {
             log.error("Error run job.", e);
         }

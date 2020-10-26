@@ -13,6 +13,7 @@ import org.harvanir.batch.springbatch.batch.report.ReportFactory;
 import org.harvanir.batch.springbatch.batch.writer.WorkbookItemWriter;
 import org.harvanir.batch.springbatch.entity.FileType;
 import org.harvanir.batch.springbatch.entity.JobServiceRequest;
+import org.harvanir.batch.springbatch.service.JobFactory;
 import org.harvanir.batch.springbatch.util.ObjectMapperUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -63,7 +64,13 @@ import static org.harvanir.batch.springbatch.batch.constant.BatchConstant.JdbcTo
  */
 @Slf4j
 @Configuration(proxyBeanMethods = false)
-public class JdbcToFileJobConfiguration {
+public class JdbcToFileJobConfiguration implements JobFactory {
+
+    private final ApplicationContext applicationContext;
+
+    public JdbcToFileJobConfiguration(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     @Bean
     public ReportFactory sqlBuilderFactory() {
@@ -249,9 +256,9 @@ public class JdbcToFileJobConfiguration {
                 .build();
     }
 
-    @Bean
+    @Bean(JOB_NAME)
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public Job jdbcToFileJob(JobServiceRequest jobServiceRequest, ApplicationContext applicationContext) {
+    public Job defaultJob(JobServiceRequest jobServiceRequest) {
         log.info("Initializing job...");
 
         JobBuilderFactory jobBuilderFactory = applicationContext.getBean(JobBuilderFactory.class);
