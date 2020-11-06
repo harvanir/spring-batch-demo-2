@@ -14,6 +14,10 @@ public interface Report {
 
     String getFromClause();
 
+    String getWhereClause();
+
+    Map<String, Object> getParameterValues();
+
     Map<String, Order> getSortKeys();
 
     String getSql();

@@ -18,6 +18,10 @@ public class DefaultReport implements Report {
 
     private final String fromClause;
 
+    private final String whereClause;
+
+    private final Map<String, Object> parameterValues;
+
     private final Map<String, Order> sortKeys;
 
     private final String sql;
@@ -36,6 +40,16 @@ public class DefaultReport implements Report {
     @Override
     public String getFromClause() {
         return fromClause;
+    }
+
+    @Override
+    public String getWhereClause() {
+        return whereClause;
+    }
+
+    @Override
+    public Map<String, Object> getParameterValues() {
+        return parameterValues;
     }
 
     @Override

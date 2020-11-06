@@ -28,6 +28,9 @@ public class DefaultReportFactory implements ReportFactory, InitializingBean {
     public void afterPropertiesSet() throws Exception {
         String selectClause = "select id, name, quantity, price, created_at, created_by, updated_at, updated_by ";
         String fromClause = "from items";
+        String whereClause = "id >= ? ";
+        Map<String, Object> parameterValues = new HashMap<>();
+        parameterValues.put("1", 0);
         Map<String, Order> sortKeys = new HashMap<>();
         sortKeys.put("created_at", Order.ASCENDING);
         sortKeys.put("id", Order.ASCENDING);
@@ -35,6 +38,8 @@ public class DefaultReportFactory implements ReportFactory, InitializingBean {
         sqlBuilderMap.put(1, DefaultReport.builder()
                 .selectClause(selectClause)
                 .fromClause(fromClause)
+                .whereClause(whereClause)
+                .parameterValues(parameterValues)
                 .sortKeys(sortKeys)
                 .sql(selectClause + fromClause)
                 .preparedStatementSetter(null)
@@ -44,6 +49,10 @@ public class DefaultReportFactory implements ReportFactory, InitializingBean {
 
         selectClause = "select id, status, status_code, created_at, created_by, updated_at, updated_by ";
         fromClause = "from orders";
+        whereClause = "id >= :id ";
+        parameterValues = new HashMap<>();
+        parameterValues.put("id", 0);
+        // parameterValues.put("ids", 0); // error, No value supplied for the SQL parameter 'id': No value registered for key 'id'
         sortKeys = new HashMap<>();
         sortKeys.put("created_at", Order.ASCENDING);
         sortKeys.put("id", Order.ASCENDING);
@@ -51,6 +60,8 @@ public class DefaultReportFactory implements ReportFactory, InitializingBean {
         sqlBuilderMap.put(2, DefaultReport.builder()
                 .selectClause(selectClause)
                 .fromClause(fromClause)
+                .whereClause(whereClause)
+                .parameterValues(parameterValues)
                 .sortKeys(sortKeys)
                 .sql(selectClause + fromClause)
                 .preparedStatementSetter(null)

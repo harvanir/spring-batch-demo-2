@@ -134,6 +134,8 @@ public class JdbcToFileJobConfiguration implements JobFactory {
         builder.selectClause(report.getSelectClause());
         builder.fromClause(report.getFromClause());
         builder.sortKeys(report.getSortKeys());
+        builder.whereClause(report.getWhereClause());
+        builder.parameterValues(report.getParameterValues());
         builder.dataSource(dataSource);
         builder.rowMapper(new ListObjectRowMapper());
         builder.pageSize(properties.getReport().getChunkSize());
